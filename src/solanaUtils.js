@@ -67,21 +67,20 @@ async function getKeypairFromSeed(seedPhrase) {
   return Keypair.fromSeed(derivedSeed.slice(0, 32));
 }
 
-// Function to validate Base58 string
-function isValidBase58(str) {
-  const base58Regex = /^[1-9A-HJ-NP-Za-km-z]+$/;
-  return base58Regex.test(str);
+function isValidBase58(input) {
+  const base58Chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  return [...input].every(char => base58Chars.includes(char));
 }
 
 function getKeypairFromPrivateKey(privateKey) {
   if (!isValidBase58(privateKey)) {
-    throw new Error('Invalid private key format: Non-base58 character detected');
+    throw new Error(`Invalid private key format: Non-base58 character detected in key: ${privateKey}`);
   }
   try {
     const decodedPrivateKey = base58.decode(privateKey);
     return Keypair.fromSecretKey(decodedPrivateKey);
   } catch (error) {
-    throw new Error('Invalid private key format: ' + error.message);
+    throw new Error(`Failed to decode private key: ${error.message}`);
   }
 }
 
