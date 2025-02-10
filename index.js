@@ -45,7 +45,7 @@ async function transferSol(
 
   for (const [index, seedOrKey] of seedPhrasesOrKeys.entries()) {
     let fromKeypair;
-    if (seedPhrasesOrKeys === '0') {
+    if (method === '0') {
       fromKeypair = await getKeypairFromSeed(seedOrKey);
     } else {
       fromKeypair = getKeypairFromPrivateKey(seedOrKey);
