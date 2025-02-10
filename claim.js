@@ -68,7 +68,7 @@ async function getToken(privateKey) {
 
     return response.data.data.token;
   } catch (error) {
-    console.log(`Error fetching token: ${error}`.red);
+    console.log(`Error fetching token: ${error.response?.data?.message || error.message}`.red);
   }
 }
 
@@ -89,7 +89,7 @@ async function getProfile(token) {
 
     return data.data;
   } catch (error) {
-    console.log(`Error fetching profile: ${error}`.red);
+    console.log(`Error fetching profile: ${error.response?.data?.message || error.message}`.red);
   }
 }
 
@@ -107,7 +107,7 @@ async function doTransactions(tx, keypair, retries = 3) {
 
       return doTransactions(tx, keypair, retries - 1);
     } else {
-      console.log(`Error in transaction: ${error}`.red);
+      console.log(`Error in transaction: ${error.response?.data?.message || error.message}`.red);
       throw error;
     }
   }
@@ -162,7 +162,7 @@ async function openMysteryBox(token, keypair, retries = 3) {
 
       return openMysteryBox(token, keypair, retries - 1);
     } else {
-      console.log(`Error opening mystery box: ${error}`.red);
+      console.log(`Error opening mystery box: ${error.response?.data?.message || error.message}`.red);
       throw error;
     }
   }
@@ -260,7 +260,7 @@ async function processPrivateKey(privateKey) {
       );
     }
   } catch (error) {
-    console.log(`Error processing private key: ${error}`.red);
+    console.log(`Error processing private key: ${error.response?.data?.message || error.message}`.red);
   }
   console.log('');
 }
@@ -283,9 +283,7 @@ async function fetchDaily(token) {
     return data.data.total_transactions;
   } catch (error) {
     console.log(
-      `[ ${moment().format('HH:mm:ss')} ] Error in daily fetching: ${
-        error.response.data.message
-      }`.red
+      `[ ${moment().format('HH:mm:ss')} ] Error in daily fetching: ${error.response?.data?.message || error.message}`.red
     );
   }
 }
@@ -371,127 +369,4 @@ async function dailyClaim(token) {
     }
   } catch (error) {
     console.log(
-      `[ ${moment().format('HH:mm:ss')} ] Error in daily claim: ${
-        error.message
-      }`.red
-    );
-  }
-}
-
-async function dailyLogin(token, keypair) {
-  try {
-    const { data } = await axios({
-      url:
-        apiBaseUrl +
-        (getNetType() == 3
-          ? '/testnet-v1'
-          : getNetType() == 2
-          ? '/testnet'
-          : '') +
-        '/user/check-in/transaction',
-      method: 'GET',
-      headers: { ...HEADERS, Authorization: token },
-    });
-
-    const txBuffer = Buffer.from(data.data.hash, 'base64');
-    const tx = solana.Transaction.from(txBuffer);
-
-    tx.partialSign(keypair);
-
-    const signature = await doTransactions(tx, keypair);
-
-    const response = await axios({
-      url:
-        apiBaseUrl +
-        (getNetType() == 3
-          ? '/testnet-v1'
-          : getNetType() == 2
-          ? '/testnet'
-          : '') +
-        '/user/check-in',
-      method: 'POST',
-      headers: { ...HEADERS, Authorization: token },
-      data: {
-        hash: signature,
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    if (error.response.data.message === 'current account already checked in') {
-      console.log(
-        `[ ${moment().format('HH:mm:ss')} ] Error in daily login: ${
-          error.response.data.message
-        }`.red
-      );
-    } else {
-      console.log(
-        `[ ${moment().format('HH:mm:ss')} ] Error claiming: ${
-          error.response.data.message
-        }`.red
-      );
-    }
-  }
-}
-
-async function openMultipleBoxes(token, keypair, totalClaim) {
-  for (let i = 0; i < totalClaim; i++) {
-    const openedBox = await openMysteryBox(token, keypair);
-
-    if (openedBox.data.success) {
-      console.log(
-        `[ ${moment().format('HH:mm:ss')} ] Box opened successfully! Status: ${
-          openedBox.status
-        } | Amount: ${openedBox.data.amount}`.green
-      );
-    } else {
-      console.log(
-        `[ ${moment().format('HH:mm:ss')} ] All boxes has been opened.`.red
-      );
-    }
-  }
-}
-
-async function runAutoFlow(token, keypair) {
-  while (true) {
-    try {
-      await dailyLogin(token, keypair);
-      await dailyClaim(token);
-      const availableBoxes = (await getProfile(token)).ring_monitor;
-      await openMultipleBoxes(token, keypair, availableBoxes);
-      console.log(
-        `[ ${moment().format('HH:mm:ss')} ] Auto flow completed!`.cyan
-      );
-    } catch (error) {
-      console.log(
-        `[ ${moment().format('HH:mm:ss')} ] Error in auto flow: ${error}`.red
-      );
-    }
-
-    console.log(
-      `\n[ ${moment().format('HH:mm:ss')} ] Waiting 12 hours before next run...`
-        .yellow
-    );
-    await delay(12 * 60 * 60 * 1000);
-  }
-}
-
-(async () => {
-  try {
-    displayHeader();
-    connection = getConnection();
-
-    for (let i = 0; i < PRIVATE_KEYS.length; i++) {
-      const privateKey = PRIVATE_KEYS[i];
-      await processPrivateKey(privateKey);
-    }
-
-    console.log('All private keys processed.'.cyan);
-  } catch (error) {
-    console.log(`Error in bot operation: ${error}`.red);
-  } finally {
-    console.log(
-      'Thanks for having us! Subscribe: https://t.me/HappyCuanAirdrop'.magenta
-    );
-  }
-})();
+      `[ ${moment().format('HH:mm:ss')} ] Error in daily claim:
