@@ -67,8 +67,6 @@ async function getKeypairFromSeed(seedPhrase) {
   return Keypair.fromSeed(derivedSeed.slice(0, 32));
 }
 
-const base58 = require('bs58');
-
 // Function to validate Base58 string
 function isValidBase58(str) {
   const base58Regex = /^[1-9A-HJ-NP-Za-km-z]+$/;
