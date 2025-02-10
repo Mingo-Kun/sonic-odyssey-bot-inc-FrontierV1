@@ -67,7 +67,18 @@ async function getKeypairFromSeed(seedPhrase) {
   return Keypair.fromSeed(derivedSeed.slice(0, 32));
 }
 
+const base58 = require('bs58');
+
+// Function to validate Base58 string
+function isValidBase58(str) {
+  const base58Regex = /^[1-9A-HJ-NP-Za-km-z]+$/;
+  return base58Regex.test(str);
+}
+
 function getKeypairFromPrivateKey(privateKey) {
+  if (!isValidBase58(privateKey)) {
+    throw new Error('Invalid private key format: Non-base58 character detected');
+  }
   try {
     const decodedPrivateKey = base58.decode(privateKey);
     return Keypair.fromSecretKey(decodedPrivateKey);
