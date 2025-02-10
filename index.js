@@ -17,6 +17,7 @@ const {
 const { displayHeader, getNetworkTypeFromUser } = require('./src/displayUtils');
 
 async function transferSol(
+  method, // Add method as a parameter
   seedPhrasesOrKeys,
   addressCount,
   amountToSend,
@@ -77,6 +78,7 @@ async function transferSol(
 }
 
 function setupCronJob(
+  method, // Add method as a parameter
   seedPhrasesOrKeys,
   addressCount,
   amountToSend,
@@ -87,6 +89,7 @@ function setupCronJob(
   const cronJob = new cron.CronJob('0 0 * * *', async () => {
     console.log(colors.blue('Running scheduled transfer...'));
     await transferSol(
+      method,
       seedPhrasesOrKeys,
       addressCount,
       amountToSend,
@@ -170,6 +173,7 @@ function setupCronJob(
   if (executionMode === '0') {
     console.log(colors.yellow('Running one-time transfer...'));
     await transferSol(
+      method,
       seedPhrasesOrKeys,
       addressCount,
       amountToSend,
@@ -181,12 +185,13 @@ function setupCronJob(
       colors.yellow('Running first-time transfer and setting up auto mode...')
     );
     await transferSol(
+      method,
       seedPhrasesOrKeys,
       addressCount,
       amountToSend,
       delayBetweenTx
     );
-    setupCronJob(seedPhrasesOrKeys, addressCount, amountToSend, delayBetweenTx);
+    setupCronJob(method, seedPhrasesOrKeys, addressCount, amountToSend, delayBetweenTx);
   } else {
     console.error(colors.red('Invalid selection. Exiting...'));
   }
