@@ -23,7 +23,7 @@ Sonic Odyssey Bot is an application designed for interacting with the Sonic Odys
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/dante4rt/sonic-odyssey-bot.git
+   https://github.com/Mingo-Kun/sonic-odyssey-bot-inc-FrontierV1.git
    ```
 
 2. Navigate into the project directory:
@@ -48,16 +48,14 @@ Sonic Odyssey Bot is an application designed for interacting with the Sonic Odys
    Example `accounts.json`:
    ```json
    [
-     "seed_phrase_1",
-     "seed_phrase_2"
+     "your_seed_phrase_1"
    ]
    ```
 
    Example `privateKeys.json`:
    ```json
    [
-     "base58_private_key_1",
-     "base58_private_key_2"
+     "your_base58_private_key_1"
    ]
    ```
 
