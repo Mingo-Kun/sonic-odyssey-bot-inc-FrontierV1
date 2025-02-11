@@ -396,6 +396,8 @@ async function runAutoFlow(token, keypair) {
 (async () => {
   try {
     displayHeader();
+    // Initialize the network (calls setNetType internally)
+    await getNetworkTypeFromUser();
     connection = getConnection();
     for (let i = 0; i < PRIVATE_KEYS.length; i++) {
       const privateKey = PRIVATE_KEYS[i];
@@ -408,3 +410,4 @@ async function runAutoFlow(token, keypair) {
     console.log('Thanks for having us! Subscribe: https://t.me/HappyCuanAirdrop'.magenta);
   }
 })();
+
